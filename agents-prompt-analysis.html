@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全局开发规范解析 · 为什么这份提示词有效</title>
+<style>
+:root{
+  --bg:#f5f7fa; --card:#ffffff; --ink:#1f2933; --muted:#5f6e7c;
+  --line:#e4e8ee; --accent:#2563eb; --accent-soft:#eef4ff;
+  --red:#c92a1e; --red-soft:#fef2f1;
+  --orange:#a15c07; --orange-soft:#fff8e9;
+  --green:#067647; --green-soft:#ecfdf3;
+  --blue:#175cd3; --blue-soft:#eff8ff;
+  --gray:#4b5565; --gray-soft:#f2f4f7;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.85;font-size:15.5px}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px 90px}
+
+header{background:linear-gradient(135deg,#0b1f4b,#1d4ed8 55%,#3b82f6);
+  color:#fff;padding:66px 20px 78px;text-align:center}
+header h1{font-size:30px;letter-spacing:1px}
+header .sub{opacity:.92;margin-top:12px;font-size:16px}
+.chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:24px}
+.chip{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.4);
+  padding:5px 16px;border-radius:999px;font-size:13.5px}
+.stats{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin-top:26px;
+  font-size:13.5px;opacity:.95}
+.stats b{font-size:17px;display:block}
+
+main{margin-top:-34px}
+.lede{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+  border-radius:12px;padding:24px 28px;box-shadow:0 1px 3px rgba(16,24,40,.06)}
+.lede b{color:var(--accent)}
+
+h2.sec{display:flex;align-items:center;gap:12px;margin:58px 0 6px;font-size:22px}
+h2.sec .no{background:var(--accent);color:#fff;border-radius:8px;width:32px;height:32px;
+  display:inline-flex;align-items:center;justify-content:center;font-size:16px;flex:none}
+.sec-sub{color:var(--muted);margin:0 0 20px 44px;font-size:14px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(295px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:20px 22px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+.card h3{font-size:16.5px;margin-bottom:10px;line-height:1.5}
+.card h3 .idx{color:var(--accent);font-weight:800;margin-right:4px}
+.tag{display:inline-block;background:var(--accent-soft);color:var(--accent);
+  border-radius:6px;padding:1px 8px;font-size:12px;font-weight:600;vertical-align:2px;white-space:nowrap}
+.kv{margin:7px 0;font-size:14.3px;padding-left:52px;position:relative}
+.kv .k{position:absolute;left:0;top:0;font-weight:700;color:var(--muted);font-size:12.5px;
+  background:var(--gray-soft);border-radius:5px;padding:0 7px;margin-top:4px}
+.kv b{color:var(--ink)}
+
+.priority{background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:22px 26px;margin-top:18px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+.priority h4{font-size:15px;margin-bottom:14px;color:var(--muted);font-weight:600}
+.pbar{display:flex;align-items:center;gap:14px;margin:7px 0}
+.pbar .lvl{flex:none;width:210px;font-weight:700;font-size:13.8px}
+.pbar .bar{height:30px;border-radius:7px;color:#fff;font-size:13px;
+  display:flex;align-items:center;padding:0 12px;white-space:nowrap;overflow:hidden}
+.p0 .bar{background:#c92a1e;width:88%}
+.p1 .bar{background:#e8590c;width:73%}
+.p2 .bar{background:#1d6ae5;width:58%}
+.p3 .bar{background:#0e8a8a;width:44%}
+.p4 .bar{background:#7c8794;width:31%}
+.pnote{font-size:13px;color:var(--muted);margin-top:12px}
+
+.cat{display:flex;align-items:center;gap:10px;margin:30px 0 12px;font-weight:800;font-size:16px}
+.cat .dot{width:11px;height:11px;border-radius:50%;flex:none}
+.dot.g{background:#12b76a}.dot.o{background:#f79009}.dot.b{background:#2e90fa}
+.cat small{font-weight:400;color:var(--muted);font-size:13.5px}
+
+.sc{background:var(--card);border:1px solid var(--line);border-left-width:4px;
+  border-radius:10px;padding:16px 20px 14px;margin-bottom:12px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.sc.g{border-left-color:#12b76a}.sc.o{border-left-color:#f79009}.sc.b{border-left-color:#2e90fa}
+.sc-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.sc-head .title{font-weight:700;font-size:15.5px}
+.sc p{font-size:14.3px;margin:5px 0}
+.sc .k{display:inline-block;min-width:58px;text-align:center;font-weight:700;font-size:12px;
+  border-radius:5px;padding:0 7px;margin-right:6px}
+.sc.g .k{background:var(--green-soft);color:var(--green)}
+.sc.o .k{background:var(--orange-soft);color:var(--orange)}
+.sc.b .k{background:var(--blue-soft);color:var(--blue)}
+.sc .rule{background:var(--gray-soft);color:var(--gray)}
+.sc .why{color:var(--muted);font-size:13.3px;margin-top:7px;border-top:1px dashed var(--line);padding-top:7px}
+
+.lim{border-left:4px solid #98a2b3}
+.lim h3{color:var(--gray)}
+
+footer{margin-top:70px;text-align:center;color:var(--muted);font-size:13px;
+  border-top:1px solid var(--line);padding-top:24px}
+code{background:var(--gray-soft);border-radius:4px;padding:0 5px;font-size:.92em}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>全局开发规范解析</h1>
+  <p class="sub">为什么这份 AGENTS.md 有效 —— 以及它在各种真实情况下会让 Agent 怎么做</p>
+  <div class="chips">
+    <span class="chip">防擅自行动</span>
+    <span class="chip">防无限瞎试</span>
+    <span class="chip">防假装完成</span>
+    <span class="chip">防破坏用户工作</span>
+  </div>
+  <div class="stats">
+    <div><b>14</b>个章节</div>
+    <div><b>5</b>级优先级</div>
+    <div><b>3</b>次止损阈值</div>
+    <div><b>12</b>个推演场景</div>
+  </div>
+</header>
+
+<div class="wrap">
+<main>
+
+  <div class="lede">
+    <b>一句话总结：</b>这份规范的本质，是把"一个聪明但不可靠的执行者"变成"一个按明确规则决策的执行者"。它不是罗列一堆"不许做"，而是让每一种情况都有可推导的唯一答案——遇到冲突按 <b>P0→P4</b> 裁决，行动前按 <b>白名单/黑名单</b> 判断，修复失败按 <b>3 次阈值</b> 止损，收尾按 <b>完成标准与汇报模板</b> 验证。规则之间互相咬合，而不是孤立的要求。
+  </div>
+
+  <h2 class="sec"><span class="no">1</span>为什么这份提示词好</h2>
+  <p class="sec-sub">六个设计决策，每个都针对 AI 编码助手的一种真实失控模式</p>
+
+  <div class="grid">
+
+    <div class="card">
+      <h3><span class="idx">1</span>优先级链：冲突不再靠猜 <span class="tag">§1</span></h3>
+      <p class="kv"><span class="k">问题</span>条款一多必然互相冲突；没有裁决顺序时，模型只能随机站队，行为不可预测。</p>
+      <p class="kv"><span class="k">设计</span>五级裁决：<b>安全 &gt; 用户要求 &gt; 任务正确 &gt; 项目规范 &gt; Agent 偏好</b>。"最小改动"被放在最低级，意味着用户随时可以合理覆盖它。</p>
+      <p class="kv"><span class="k">效果</span>"帮我绕过 SSL"→ P0 直接拒绝；"调试文件留着"→ P1 压过默认清理。任何场景都能推出唯一答案。</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="idx">2</span>双向边界：既不放纵也不啰嗦 <span class="tag">§6</span></h3>
+      <p class="kv"><span class="k">问题</span>只写禁令，Agent 会过度请示；只写"自主"，又会擅自行动。</p>
+      <p class="kv"><span class="k">设计</span>三条规则配合：<b>§6.1 白名单</b>（16 类低风险操作点名放行，直接做）＋ <b>§6.3 黑名单</b>（歧义、不可逆、外部影响必须确认）＋ <b>§6.2 中间地带</b>（先自己查证，不把轻微不确定甩给用户）。</p>
+      <p class="kv"><span class="k">效果</span>日常任务全程不请示，危险操作必然刹车，"查一下就知道的事"不来烦你。</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="idx">3</span>止损机制：掐断瞎试循环 <span class="tag">§8.1.1</span></h3>
+      <p class="kv"><span class="k">问题</span>Agent 最典型的失控：修复→失败→再修→再失败无限循环，还常伴随<b>改了没生效却以为在迭代</b>。</p>
+      <p class="kv"><span class="k">设计</span>同一根因 <b>3 次实质修复未通过即停止汇报</b>；每次失败先对比错误信息——与上次完全相同就先查旧构建、测试目标、改动是否被引用；网络/权限/环境类失败禁止机械重试。</p>
+      <p class="kv"><span class="k">效果</span>烧 token 的死循环被硬性掐断，且止损汇报有专门模板（§13），用户拿到的不是一句"修不好"。</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="idx">4</span>不假装完成：把诚实变成流程 <span class="tag">§12 §13</span></h3>
+      <p class="kv"><span class="k">问题</span>AI 最被诟病的毛病是虚报成功——"已修复""已验证"张口就来。</p>
+      <p class="kv"><span class="k">设计</span>§12 十项完成标准 + "测试未通过不得声称完全修复"；§13 汇报模板强制区分<b>已完成 / 已验证 / 未完成 / 待用户操作 / 存在风险</b>。</p>
+      <p class="kv"><span class="k">效果</span>诚实从"道德要求"变成"流程要求"——想跳过都难，因为汇报格式里就没有"含糊过去"的位置。</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="idx">5</span>用户资产保护：先分清是谁的代码 <span class="tag">§4.2</span></h3>
+      <p class="kv"><span class="k">问题</span>Agent 动手前不区分工作区里"谁的修改"，一句 <code>git reset --hard</code> 就能毁掉用户几小时的工作。</p>
+      <p class="kv"><span class="k">设计</span>开工先 <code>git status</code> 摸底；已有未提交修改<b>默认全部属于用户</b>：不覆盖、不重置、不清理、不擅自提交；必须同文件修改时做最小增量，合不进来就停下来问。</p>
+      <p class="kv"><span class="k">效果</span>用户未提交的工作在任何任务中都是安全的，Agent 的改动和用户的改动始终可区分、可分别提交。</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="idx">6</span>环境对齐：把现实钉死在开头 <span class="tag">§2</span></h3>
+      <p class="kv"><span class="k">问题</span>大量提示词模板抄自 Linux 语境，在 Windows 上第一课就是翻车：假设有 sudo、用反斜杠路径、调不存在的命令。</p>
+      <p class="kv"><span class="k">设计</span>显式声明 <b>Windows + Git Bash</b>：不假设 sudo/apt 存在，平台相关命令先检测再执行；路径统一正斜杠、含空格必加双引号（并点明"不加引号会被拆参、可能误删"）；语言四分法（沟通中文 / 代码英文 / 注释中文 / commit 中文）。</p>
+      <p class="kv"><span class="k">效果</span>Agent 的每个 shell 命令都先过一遍"这台机器上真的能跑吗"。</p>
+    </div>
+
+  </div>
+
+  <div class="priority">
+    <h4>五级优先级链一览 —— 冲突时自上而下裁决</h4>
+    <div class="pbar p0"><span class="lvl">P0 · 绝对安全边界</span><div class="bar">任何用户要求都不能突破</div></div>
+    <div class="pbar p1"><span class="lvl">P1 · 用户明确要求</span><div class="bar">不违反 P0 时最高优先</div></div>
+    <div class="pbar p2"><span class="lvl">P2 · 任务目标与正确性</span><div class="bar">偏离项目规范需说明原因</div></div>
+    <div class="pbar p3"><span class="lvl">P3 · 项目现有规范</span><div class="bar">技术栈 / 风格 / 包管理器</div></div>
+    <div class="pbar p4"><span class="lvl">P4 · Agent 默认偏好</span><div class="bar">只是默认策略</div></div>
+    <p class="pnote">关键在层级关系："最小必要修改""尽量用 Git"这些好习惯都在 P4 —— 好习惯让位于用户要求，用户要求让位于安全。</p>
+  </div>
+
+  <h2 class="sec"><span class="no">2</span>场景推演：遇到各种情况时会发生什么</h2>
+  <p class="sec-sub">12 个典型场景，按"日常任务 / 危险请求 / 故障意外"三类，看规则如何落到具体行为</p>
+
+  <div class="cat"><span class="dot g"></span>日常任务 —— 快而稳<small>（白名单放行，全程不请示）</small></div>
+
+  <div class="sc g">
+    <div class="sc-head"><span class="title">场景 1 · "帮我修复登录 bug"</span><span class="tag">§5 工作流</span><span class="tag">§6.1 白名单</span></div>
+    <p><span class="k">Agent 会</span>git status 摸底 → 定位相关代码 → 分析现有实现 → 最小修复 → 跑测试 → diff 复查 → commit + 中文汇报，全程自主推进，不逐步请示。</p>
+    <p class="why">为什么好：高效被写成了默认路径，而不是指望模型"临场发挥"——它不需要决定要不要先看 git 状态，规则已经替它决定了。</p>
+  </div>
+
+  <div class="sc g">
+    <div class="sc-head"><span class="title">场景 2 · 工作区里有你改到一半的文件</span><span class="tag">§4.2</span></div>
+    <p><span class="k">Agent 会</span>把已有未提交修改认定为你的人力资产：在改动基础上增量修改；实在合不进来就停下来问，绝不覆盖或回滚。</p>
+    <p class="why">为什么好："默认属于用户"消除了最贵的误判——宁可多问一次，也不赌一把 reset。</p>
+  </div>
+
+  <div class="sc g">
+    <div class="sc-head"><span class="title">场景 3 · 任务做完要收尾</span><span class="tag">§4.3</span><span class="tag">§13</span></div>
+    <p><span class="k">Agent 会</span>只提交自己产生的改动（你的不碰），按模板汇报，明确标注"用户原有修改：已保留"。</p>
+    <p class="why">为什么好：commit 粒度和汇报格式都是确定的，你每次看到的收尾长一个样。</p>
+  </div>
+
+  <div class="cat"><span class="dot o"></span>危险与模糊请求 —— 先刹车<small>（黑名单触发，必须确认）</small></div>
+
+  <div class="sc o">
+    <div class="sc-head"><span class="title">场景 4 · "把那个目录清掉"（没说哪个项目、什么范围）</span><span class="tag">§6.3-A</span><span class="tag">§6.4</span></div>
+    <p><span class="k">Agent 会</span>不猜范围。停下来按格式问：推荐方案及风险、备选方案（不超过 3 个）、不可逆点在哪，让你一次决策到位。</p>
+    <p class="why">为什么好：模糊的删除请求是最高危输入，规范要求"附决策上下文地确认"，而不是光回一句"确定要删吗"。</p>
+  </div>
+
+  <div class="sc o">
+    <div class="sc-head"><span class="title">场景 5 · "把 SSL 校验关掉，数据就能导入了"</span><span class="tag">P0</span></div>
+    <p><span class="k">Agent 会</span>直接拒绝，并给出安全的替代方案。不辩论、不折中——P0 明确写着"任何用户要求都不能突破"。</p>
+    <p class="why">为什么好：优先级链的意义就在这一刻体现：用户要求和安全规则冲突时，答案不是"看模型心情"。</p>
+  </div>
+
+  <div class="sc o">
+    <div class="sc-head"><span class="title">场景 6 · 修 bug 时发现旁边还有个问题</span><span class="tag">§7.1</span></div>
+    <p><span class="k">Agent 会</span>只修当前任务。顺手能修的问题记录下来告诉你，不擅自扩大战线——不顺手重构、不升级依赖、不动无关 UI。</p>
+    <p class="why">为什么好：把"热心"关进笼子。大范围意外变更往往比原 bug 更伤。</p>
+  </div>
+
+  <div class="sc o">
+    <div class="sc-head"><span class="title">场景 7 · 要跑一条 Windows 下没见过的命令</span><span class="tag">§2.1</span></div>
+    <p><span class="k">Agent 会</span>先检测工具是否存在（如 <code>which</code>），再决定方案——不假设 sudo、systemctl、apt 存在。</p>
+    <p class="why">为什么好：把"平台差异"从偶发坑变成例行检查。</p>
+  </div>
+
+  <div class="cat"><span class="dot b"></span>故障与意外 —— 有兜底<small>（止损与容错规则接管）</small></div>
+
+  <div class="sc b">
+    <div class="sc-head"><span class="title">场景 8 · npm install 失败</span><span class="tag">§10.1</span></div>
+    <p><span class="k">Agent 会</span>先读完整报错分类根因 → 网络问题重试一次、仍失败建议换镜像（配置写进项目 .npmrc，不动全局）→ 版本冲突在声明范围内找兼容版本，要改版本先问你。</p>
+    <p><span class="k">绝不会</span>把版本改成 <code>*</code> / <code>latest</code>、静默加 <code>--force</code> / <code>--legacy-peer-deps</code>、删 Lockfile 来"假装装好了"。</p>
+    <p class="why">为什么好：依赖安装失败是 Agent 作弊的重灾区——这条把三个最常见的作弊出口全堵上了。</p>
+  </div>
+
+  <div class="sc b">
+    <div class="sc-head"><span class="title">场景 9 · 同一个测试修了 3 次还不过</span><span class="tag">§8.1.1</span></div>
+    <p><span class="k">Agent 会</span>停止瞎试，交止损报告：根因判断、已尝试方案及各自失败原因、当前阻塞点、下一步建议。等你指方向后才继续。</p>
+    <p class="why">为什么好：这是全文最重要的"防失控"条款——无限重试烧的是真金白银的 token，而止损后的报告让人能接手。</p>
+  </div>
+
+  <div class="sc b">
+    <div class="sc-head"><span class="title">场景 10 · 项目连 git 仓库都没有</span><span class="tag">§4.4</span></div>
+    <p><span class="k">Agent 会</span>不因没 git 就罢工，照常完成任务，只是更小心（避免不可恢复操作），结束时问你要不要 <code>git init</code> 留档。</p>
+    <p class="why">为什么好：很多规范默认"一切靠 Git"，遇到没 Git 的项目就卡死；这版写明了降级路径。</p>
+  </div>
+
+  <div class="sc b">
+    <div class="sc-head"><span class="title">场景 11 · 需要执行 UPDATE，但条件可能漏写</span><span class="tag">§11</span><span class="tag">§3.3</span></div>
+    <p><span class="k">Agent 会</span>先只读查询确认影响范围，必要时备份；无 WHERE 的 DELETE / TRUNCATE / DROP 这类操作先请求确认，不直接跑。</p>
+    <p class="why">为什么好：数据库是最没有"撤销键"的地方，规则把"先查询→确认范围→备份→修改→验证"定成了固定顺序。</p>
+  </div>
+
+  <div class="sc b">
+    <div class="sc-head"><span class="title">场景 12 · 调试脚本要不要删</span><span class="tag">§9</span></div>
+    <p><span class="k">Agent 会</span>自己本次建的默认清理；你明确说"留着"就保留并在汇报里列出；分不清是谁建的——默认保留。</p>
+    <p class="why">为什么好：三态规则（我的/你的/要求保留的）+ 不确定时偏向保守，删错文件的代价远大于留个临时文件。</p>
+  </div>
+
+  <h2 class="sec"><span class="no">3</span>边界与局限：它不能保证什么</h2>
+  <p class="sec-sub">诚实分析——一份提示词的能力边界在哪里</p>
+
+  <div class="grid">
+
+    <div class="card lim">
+      <h3>规则是概率性的，不是保证</h3>
+      <p class="kv"><span class="k">说明</span>LLM 对提示词的遵循不是 100%，且条款越长单条权重越低。这版已经过四轮去重压缩（28 节 → 14 节），冗余基本清零，但长期使用中仍会偶发违反。</p>
+      <p class="kv"><span class="k">应对</span>把实际违反案例记下来，回头修订条文——规范本身也应该被迭代。</p>
+    </div>
+
+    <div class="card lim">
+      <h3>硬阈值是权衡，不是最优解</h3>
+      <p class="kv"><span class="k">说明</span>"3 次止损"掐断了烧钱死循环，代价是偶尔会过早放弃一个第 4 次能修好的问题。</p>
+      <p class="kv"><span class="k">应对</span>这是用一点成功率换可控性。止损报告里包含"下一步建议"，你一句"换个思路继续"就能解锁。</p>
+    </div>
+
+    <div class="card lim">
+      <h3>文字流程图表达不了全部分支</h3>
+      <p class="kv"><span class="k">说明</span>§14 的流程在"停止并汇报"之后仍画到 diff / Commit，真实语义是"用户给新方向后再继续"——线性文本画不出条件分支。</p>
+      <p class="kv"><span class="k">应对</span>影响极小：正文条款（§8.1.1）的语义是准确的，流程图只是导航摘要。</p>
+    </div>
+
+    <div class="card lim">
+      <h3>它管不住提示词之外的东西</h3>
+      <p class="kv"><span class="k">说明</span>平台的系统提示、工具权限系统、模型自身能力上限，都在这份文件的作用范围之外。它规范行为偏好，不提供强制执行。</p>
+      <p class="kv"><span class="k">应对</span>真正的高危防线是平台权限确认机制 + Git 备份；这份规范是行为层的第一道闸，不是唯一一道。</p>
+    </div>
+
+  </div>
+
+</main>
+
+<footer>
+  基于 <code>C:\Users\luckyzyb\.zcode\AGENTS.md</code>（14 节定稿版）解析生成 · 2026-08<br>
+  本页为单文件自包含 HTML，双击即可打开，无外部依赖
+</footer>
+</div>
+
+</body>
+</html>
